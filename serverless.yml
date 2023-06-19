@@ -1,0 +1,80 @@
+service: Manual-Accounting-Service
+plugins:
+  - serverless-offline
+frameworkVersion: '3'
+
+useDotenv: true
+
+custom:
+  tableName: 'users-table-${sls:stage}'
+  serverless-offline:
+    httpPort: 4000
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [ UsersTable, Arn ]
+  environment:
+    USERS_TABLE: ${self:custom.tableName}
+
+functions:
+  getUsers:
+    handler: dist/app.getUsers
+    events:
+      - http:
+          path: users
+          method: GET
+  
+  getUser:
+    handler: dist/app.getUser
+    events:
+      - http:
+          path: users/{id}
+          method: GET
+  
+  addUser:
+    handler: dist/app.addUser
+    events:
+      - http:
+          path: addUser
+          method: POST
+  
+  deleteUser:
+    handler: dist/app.deleteUser
+    events:
+      - http:
+          path: deleteUser/{id}
+          method: POST
+  
+  updateUser:
+    handler: dist/app.updateUser
+    events:
+      - http:
+          path: updateUser
+          method: POST
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.tableName}
