@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { getUser, getUsers, addUser, deleteUser  } from '../functions'
-import { updateUser } from "../functions/user-crud-functions";
+import { UserController } from "../controllers";
 
 export const userRouters = Router();
+const userController = new UserController();
 
-userRouters.get('/users', getUsers);
-userRouters.get('/users/:id', getUser);
-userRouters.post('/addUser', addUser);
-userRouters.post('/deleteUser/:id', deleteUser);
-userRouters.post('/updateUser', updateUser);
+userRouters.get('/users', userController.getUsers);
+userRouters.get('/users/:id', userController.getUser);
+userRouters.post('/addUser', userController.addUser);
+userRouters.post('/deleteUser/:id', userController.deleteUser);
+userRouters.post('/updateUser', userController.updateUser);
