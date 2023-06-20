@@ -1,5 +1,5 @@
 import { User } from "../models";
-import { DynamoDBUpdateArgs } from "../models/updatedExpression";
+import { DynamoDBUpdateArgs } from "../models/dynamoDBUpdateArgs";
 
 export function generateExpression(user: User): DynamoDBUpdateArgs {
     let updateExpression: string = "SET ";
