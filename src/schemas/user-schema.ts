@@ -1,17 +1,17 @@
 export const addUserSchema = {
     type: "object",
     properties: {
-        name: {
+        username: {
             type: "string"
         },
-        surname: {
+        userSurname: {
             type: "string"
         },
         entryTime: {
             type: "string"
         }
     },
-    required: ["name", "surname", "entryTime"],
+    required: ["username", "userSurname", "entryTime"],
     additionalProperties: false
 }
 
@@ -21,15 +21,16 @@ export const updateUserSchema = {
         userId: {
             type: "string"
         },
-        name: {
+        username: {
             type: "string"
         },
-        surname: {
+        userSurname: {
             type: "string"
         },
         entryTime: {
             type: "string"
-        },
-        additionalProperties: false
-    }
+        }
+    },
+    required: ["userId"],
+    additionalProperties: false
 }

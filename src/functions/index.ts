@@ -1,3 +1,3 @@
-import { getUsers, getUser, deleteUser, addUser, updateUser } from './user-crud-functions';
+import { generateExpression } from "./expression-generator";
 
-export { getUsers, getUser, deleteUser, addUser, updateUser }
+export { generateExpression }

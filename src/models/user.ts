@@ -1,6 +1,8 @@
 export class User {
+    [key: string]: string | undefined;
+
     userId?: string;
-    name?: string;
-    surname?: string;
+    username?: string;
+    userSurname?: string;
     entryTime?: string;
 }
