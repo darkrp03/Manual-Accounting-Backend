@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { dynamoDB } from "../app";
 import { addUserSchema, updateUserSchema } from "../schemas";
-import { v4 as uuidv4 } from 'uuid';
 import Ajv from "ajv";
 import { User } from "../models";
 import { generateExpression } from "../functions";
@@ -38,15 +37,16 @@ export class UserController {
         const ajv = new Ajv();
         const validate = ajv.compile(addUserSchema);
         const isValidateSchema = validate(req.body);
+
+        console.log(req.body);
     
         if (!isValidateSchema) {
             return res.writeHead(400).end(res.statusMessage);
         }
     
-        const uuID = uuidv4();
         const newUser = {
             userId: {
-                S: uuID
+                S: req.body["userId"]
             },
             username: {
                 S: req.body["username"]

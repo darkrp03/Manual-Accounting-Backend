@@ -8,7 +8,7 @@ useDotenv: true
 custom:
   tableName: 'users-table-${sls:stage}'
   serverless-offline:
-    httpPort: 4000
+    httpPort: 3000
 
 provider:
   name: aws

@@ -5,9 +5,15 @@ import bodyParser from 'body-parser';
 import { userRouters } from './routes'
 
 const app = Express();
+const cors = require('cors');
 export const dynamoDB = new DynamoDB();
 
 app.use(bodyParser.json());
+app.use(cors());
+app.options('*', cors({
+    origin: 'localhost:5173',
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(userRouters);
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.log(err.stack);

@@ -1,6 +1,9 @@
 export const addUserSchema = {
     type: "object",
     properties: {
+        userId: {
+            type: "string"
+        },
         username: {
             type: "string"
         },
@@ -11,7 +14,7 @@ export const addUserSchema = {
             type: "string"
         }
     },
-    required: ["username", "userSurname", "entryTime"],
+    required: ["userId", "username", "userSurname", "entryTime"],
     additionalProperties: false
 }
 
@@ -25,9 +28,6 @@ export const updateUserSchema = {
             type: "string"
         },
         userSurname: {
-            type: "string"
-        },
-        entryTime: {
             type: "string"
         }
     },
