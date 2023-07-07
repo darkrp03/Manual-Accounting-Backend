@@ -1,3 +1,3 @@
-import { addUserSchema, updateUserSchema } from "./user-schema";
+import { addVisitorSchema, updateVisitorSchema } from "./visitor-schema";
 
-export { addUserSchema, updateUserSchema }
+export { addVisitorSchema, updateVisitorSchema }

@@ -1,3 +1,3 @@
-import { User } from './user';
+import { Visitor } from './visitor';
 
-export { User }
+export { Visitor }

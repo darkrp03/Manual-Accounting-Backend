@@ -1,18 +1,18 @@
-import { User } from "../models";
+import { Visitor } from "../models";
 import { DynamoDBUpdateArgs } from "../models/dynamoDBUpdateArgs";
 
-export function generateExpression(user: User): DynamoDBUpdateArgs {
+export function generateExpression(visitor: Visitor): DynamoDBUpdateArgs {
     let updateExpression: string = "SET ";
     let expressionAttributeValues: { [key: string]: any } = {};
 
-    const keys = Object.keys(user);
+    const keys = Object.keys(visitor);
 
     let i = 1;
 
     keys.forEach(key => {
-        //Skips userId key because there is no need to update
-        if (key != "userId") {
-            const keyValue = user[key];
+        //Skips visitorId key because there is no need to update
+        if (key != "visitorId") {
+            const keyValue = visitor[key];
 
             if (keyValue) {
                 //Example string: SET username = :value1

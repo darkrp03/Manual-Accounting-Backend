@@ -1,36 +1,36 @@
-export const addUserSchema = {
+export const addVisitorSchema = {
     type: "object",
     properties: {
-        userId: {
+        visitorId: {
             type: "string"
         },
-        username: {
+        visitorName: {
             type: "string"
         },
-        userSurname: {
+        visitorSurname: {
             type: "string"
         },
-        entryTime: {
+        visitorEntryTime: {
             type: "string"
         }
     },
-    required: ["userId", "username", "userSurname", "entryTime"],
+    required: ["visitorId", "visitorName", "visitorSurname", "visitorEntryTime"],
     additionalProperties: false
 }
 
-export const updateUserSchema = {
+export const updateVisitorSchema = {
     type: "object",
     properties: {
-        userId: {
+        visitorId: {
             type: "string"
         },
-        username: {
+        visitorName: {
             type: "string"
         },
-        userSurname: {
+        visitorSurname: {
             type: "string"
         }
     },
-    required: ["userId"],
+    required: ["visitorId"],
     additionalProperties: false
 }
