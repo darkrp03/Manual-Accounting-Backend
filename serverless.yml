@@ -1,12 +1,15 @@
 service: Manual-Accounting-Service
 plugins:
   - serverless-offline
+  - serverless-dotenv-plugin
+
 frameworkVersion: '3'
 
 useDotenv: true
 
 custom:
-  tableName: 'users-table-${sls:stage}'
+  visitorsTableName: 'visitors-table'
+  usersTableName: 'users-table'
   serverless-offline:
     httpPort: 3000
 
@@ -27,46 +30,87 @@ provider:
           Resource:
             - Fn::GetAtt: [ UsersTable, Arn ]
   environment:
-    USERS_TABLE: ${self:custom.tableName}
+    VISITORS_TABLE: ${self:custom.visitorsTableName}
+    USERS_TABLE: ${self:custom.usersTableName}
 
 functions:
-  getUsers:
-    handler: dist/app.getUsers
+  getVisitors:
+    handler: dist/handler.getVisitors
     events:
       - http:
-          path: users
+          path: visitors
           method: GET
+          cors: true
   
-  getUser:
-    handler: dist/app.getUser
+  getVisitor:
+    handler: dist/handler.getVisitor
     events:
       - http:
-          path: users/{id}
+          path: visitors/{id}
           method: GET
+          cors: true
   
-  addUser:
-    handler: dist/app.addUser
+  addVisitor:
+    handler: dist/handler.addVisitor
     events:
       - http:
-          path: addUser
+          path: addVisitor
           method: POST
+          cors: true
   
-  deleteUser:
-    handler: dist/app.deleteUser
+  deleteVisitor:
+    handler: dist/handler.deleteVisitor
     events:
       - http:
-          path: deleteUser/{id}
+          path: deleteVisitor/{id}
           method: POST
+          cors: true
   
-  updateUser:
-    handler: dist/app.updateUser
+  updateVisitor:
+    handler: dist/handler.updateVisitor
     events:
       - http:
-          path: updateUser
+          path: updateVisitor
           method: POST
-
+          cors: true
+  
+  login:
+    handler: dist/handler.login
+    events:
+      - http:
+          path: login
+          method: POST
+          cors: true
+  
+  user:
+    handler: dist/handler.user
+    events:
+      - http:
+          path: user
+          method: GET
+          cors: true
+  
+  logout:
+    handler: dist/handler.logout
+    events:
+      - http:
+          path: logout
+          method: GET
+          cors: true
+  
 resources:
   Resources:
+    VisitorsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: visitorsId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: visitorsId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.visitorsTableName}
     UsersTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -77,4 +121,4 @@ resources:
           - AttributeName: userId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
-        TableName: ${self:custom.tableName}
+        TableName: ${self:custom.usersTableName}
