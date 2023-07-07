@@ -1,3 +1,4 @@
+import { VisitorController } from './visitorController';
 import { UserController } from './userController';
 
-export { UserController }
+export { VisitorController, UserController }
