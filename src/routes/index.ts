@@ -1,3 +1,3 @@
-import { visitorRouters } from './visitor-route';
+import { visitorRouters } from './visitor-routes';
 
 export { visitorRouters }
