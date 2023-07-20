@@ -1,4 +1,4 @@
-import { VisitorController } from './visitorController';
-import { UserController } from './userController';
+import { VisitorController } from './visitor.controller';
+import { UserController } from './user.controller';
 
 export { VisitorController, UserController }

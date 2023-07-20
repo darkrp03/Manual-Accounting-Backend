@@ -16,3 +16,4 @@ export const updateVisitor = serverlessCallback;
 export const login = serverlessCallback;
 export const user = serverlessCallback;
 export const logout = serverlessCallback;
+export const register = serverlessCallback;

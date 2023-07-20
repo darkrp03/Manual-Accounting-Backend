@@ -1,7 +1,6 @@
-import { Visitor } from "../models";
-import { DynamoDBUpdateArgs } from "../models/dynamoDBUpdateArgs";
+import { DynamoDBUpdateArgs, Visitor } from "../models";
 
-export function generateExpression(visitor: Visitor): DynamoDBUpdateArgs {
+export default function generateExpression(visitor: Visitor): DynamoDBUpdateArgs {
     let updateExpression: string = "SET ";
     let expressionAttributeValues: { [key: string]: any } = {};
 

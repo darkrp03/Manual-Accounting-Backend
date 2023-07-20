@@ -98,6 +98,14 @@ functions:
           method: GET
           cors: true
   
+  register:
+    handler: dist/handler.register
+    events:
+      - http:
+          path: register
+          method: POST
+          cors: true
+  
 resources:
   Resources:
     VisitorsTable:

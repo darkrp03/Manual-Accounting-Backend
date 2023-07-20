@@ -1,34 +1,36 @@
-import { DynamoDB } from 'aws-sdk';
+import "reflect-metadata";
+import AWS, { DynamoDB } from 'aws-sdk';
 import Express, { NextFunction, Request, Response } from 'express';
 import bodyParser from 'body-parser';
-import { visitorRouters } from './routes'
 import fs from 'fs';
 import passport from 'passport';
 import session from 'express-session';
-import { initializePassportStrategy } from './functions/passport-strategy';
-import { userRouters } from './routes/user-routes';
+import { initializePassportStrategy } from './functions';
 import Redis from 'ioredis';
 import RedisStore from 'connect-redis';
 import cookieParser from 'cookie-parser';
+import { IRouter } from './models';
+import { gracefulify } from "graceful-fs";
+import { ContainerType, redisHost, redisPassword, redisPort, secretKey } from "./config";
+import { container } from "./container";
 
-const gracefulFs = require('graceful-fs');
-gracefulFs.gracefulify(fs);
+gracefulify(fs);
 
 export const app = Express();
-export const dynamoDB = new DynamoDB();
+export const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 const redis = new Redis({
-    host: process.env.REDIS_HOST,
-    port: Number(process.env.REDIS_PORT),
+    host: redisHost,
+    port: Number(redisPort),
     username: 'default',
-    password: process.env.REDIS_PASSWORD
+    password: redisPassword
 });
 
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(session({
-    store: new RedisStore({client: redis}),
-    secret: process.env.SECRET_KEY as string,
+    store: new RedisStore({ client: redis }),
+    secret: secretKey,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -43,17 +45,18 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*'); 
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
 
     next();
 });
 
-app.use(visitorRouters);
-app.use(userRouters);
+const routers: IRouter[] = container.getAll<IRouter>(ContainerType.IRouter);
+
+routers.forEach(router => app.use(router.getRoute()));
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     console.log(err.stack);
 
-    return res.writeHead(500).end(res.statusMessage);
+    return res.sendStatus(500);
 });
