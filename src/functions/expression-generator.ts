@@ -1,6 +1,6 @@
 import { DynamoDBUpdateArgs, Visitor } from "../models";
 
-export default function generateExpression(visitor: Visitor): DynamoDBUpdateArgs {
+export default function getVisitorUpdateExpression(index: number, visitor: Visitor): DynamoDBUpdateArgs {
     let updateExpression: string = "SET ";
     let expressionAttributeValues: { [key: string]: any } = {};
 
@@ -14,13 +14,11 @@ export default function generateExpression(visitor: Visitor): DynamoDBUpdateArgs
             const keyValue = visitor[key];
 
             if (keyValue) {
-                //Example string: SET username = :value1
-                updateExpression += `${key} = :value${i},`;
+                //Example string: SET visitors[0].username = :value1
+                updateExpression += `visitors[${index}].${key} = :value${i},`;
 
-                //Example string: { :value1: { S: "Andrew" } }
-                expressionAttributeValues[":value" + i] = {
-                    S: keyValue
-                }
+                //Example string: { :value1: "Andrew" }
+                expressionAttributeValues[":value" + i] = keyValue
             }
 
             i++;

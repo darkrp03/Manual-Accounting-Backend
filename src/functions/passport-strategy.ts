@@ -21,9 +21,7 @@ export function initializePassportStrategy() {
     passport.deserializeUser(async (username: string, done) => {
         const params = {
             Key: {
-                username: {
-                    S: username
-                }
+                username: username
             },
             TableName: userTable
         }
@@ -46,9 +44,7 @@ export function initializePassportStrategy() {
     passport.use(new Strategy(async (username, password, done) => {
         const params = {
             Key: {
-                username: {
-                    S: username
-                }
+                username: username
             },
             TableName: userTable
         }
@@ -65,15 +61,15 @@ export function initializePassportStrategy() {
             }
     
             const dynamoDBUser = data.Item;
-            const isCorrectPassword = await bcrypt.compare(password, dynamoDBUser.password.S!);
+            const isCorrectPassword = await bcrypt.compare(password, dynamoDBUser.password);
     
             if (!isCorrectPassword) {
                 return done(null, false)
             }
 
             const user: User = {
-                username: dynamoDBUser.username.S,
-                password: dynamoDBUser.password.S
+                username: dynamoDBUser.username,
+                password: dynamoDBUser.password
             };
 
             return done(null, user);

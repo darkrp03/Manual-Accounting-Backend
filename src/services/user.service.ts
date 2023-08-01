@@ -1,20 +1,25 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { dynamoDB } from "../app";
 import { validateSchema } from "../functions";
 import { userSchema } from "../schemas";
 import bcrypt from "bcrypt";
 import { User } from "../models";
-import { userTable } from "../config";
+import { ContainerType, userTable } from "../config";
+import { VisitorService } from "./visitor.service";
 
 @injectable()
 export class UserService {
+    private readonly visitorService: VisitorService;
+
+    constructor(@inject(ContainerType.VisitorService) visitorService: VisitorService) {
+        this.visitorService = visitorService;
+    }
+
     private async isRegistered(username: string): Promise<boolean> {
         const params = {
             TableName: userTable,
             Key: {
-                username: {
-                    S: username
-                }
+                username: username
             }
         }
 
@@ -46,22 +51,14 @@ export class UserService {
             password: hashPassword
         }
 
-        const newDynamoDBUser = {
-            username: {
-                S: user.username
-            },
-            password: {
-                S: user.password
-            }
-        }
-
         const params = {
             TableName: userTable,
-            Item: newDynamoDBUser
+            Item: user
         };
 
+        this.visitorService.addUser(user.username!);
         await dynamoDB.put(params).promise();
-
+        
         return user;
     }
 }

@@ -3,6 +3,7 @@ import { VisitorController } from "../controllers";
 import { IRouter } from "../models";
 import { container } from "../container";
 import { injectable } from "inversify";
+import { checkIsAuthenticated } from "../functions";
 
 @injectable()
 export class VisitorRouter implements IRouter {
@@ -21,11 +22,10 @@ export class VisitorRouter implements IRouter {
     }
 
     initializeHTTPMethods(): void {
-        this.router.get('/visitors', this.visitorController.getVisitors.bind(this.visitorController));
-        this.router.get('/visitors/:id', this.visitorController.getVisitor.bind(this.visitorController));
-        this.router.post('/addVisitor', this.visitorController.addVisitor.bind(this.visitorController));
-        this.router.post('/deleteVisitor/:id', this.visitorController.deleteVisitor.bind(this.visitorController));
-        this.router.post('/updateVisitor', this.visitorController.updateVisitor.bind(this.visitorController));
+        this.router.get('/visitors', checkIsAuthenticated, this.visitorController.getVisitors.bind(this.visitorController));
+        this.router.post('/addVisitor', checkIsAuthenticated, this.visitorController.addVisitor.bind(this.visitorController));
+        this.router.post('/deleteVisitor', checkIsAuthenticated, this.visitorController.deleteVisitor.bind(this.visitorController));
+        this.router.post('/updateVisitor', checkIsAuthenticated, this.visitorController.updateVisitor.bind(this.visitorController));
     }
 }
 

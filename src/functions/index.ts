@@ -1,9 +1,9 @@
-import generateExpression from "./expression-generator";
+import getVisitorUpdateExpression from "./expression-generator";
 import validateSchema from "./schema-validator";
 import { checkIsAuthenticated, initializePassportStrategy } from "./passport-strategy";
 
 export { 
-    generateExpression, 
+    getVisitorUpdateExpression, 
     validateSchema, 
     checkIsAuthenticated, 
     initializePassportStrategy 

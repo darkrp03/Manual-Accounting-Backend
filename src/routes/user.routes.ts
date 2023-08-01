@@ -23,7 +23,7 @@ export class UserRouter implements IRouter {
     }
 
     initializeHTTPMethods(): void {
-        this.router.get('/user', checkIsAuthenticated, this.userController.getUser.bind(this.userController));
+        this.router.get('/user', checkIsAuthenticated, this.userController.getLoginStatus.bind(this.userController));
         this.router.post('/login', passport.authenticate('local'), this.userController.login.bind(this.userController));
         this.router.get('/logout', checkIsAuthenticated, this.userController.logout.bind(this.userController));
         this.router.post('/register', this.userController.register.bind(this.userController));

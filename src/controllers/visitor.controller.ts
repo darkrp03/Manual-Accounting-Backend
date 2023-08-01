@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { VisitorService } from "../services";
 import { inject, injectable } from "inversify";
-import { ContainerType, redisHost, redisPassword, redisPort, secretKey } from "../config";
+import { ContainerType } from "../config";
 
 @injectable()
 export class VisitorController {
@@ -12,19 +12,15 @@ export class VisitorController {
     }
 
     async getVisitors(req: Request, res: Response) {
-        const items = await this.visitorService.getVisitors();
+        const user = req.user as { username: string };
+        const visitors = await this.visitorService.getVisitors(user.username);
 
-        res.send(items);
-    }
-
-    async getVisitor(req: Request, res: Response) {
-        const item = await this.visitorService.getVisitor(req.params.id);
-
-        res.send(item);
+        res.send(visitors);
     }
 
     async addVisitor(req: Request, res: Response) {
-        const isVisitorAdded = await this.visitorService.tryToAddVisitor(req.body);
+        const user = req.user as { username: string };
+        const isVisitorAdded = await this.visitorService.tryToAddVisitor(user.username, req.body);
 
         if (!isVisitorAdded) {
             return res.sendStatus(400);
@@ -34,13 +30,19 @@ export class VisitorController {
     }
 
     async deleteVisitor(req: Request, res: Response) {
-        this.visitorService.deleteVisitor(req.params.id);
+        if (!req.body["visitorId"]) {
+            return res.sendStatus(400);
+        }
+
+        const user = req.user as { username: string };
+        this.visitorService.deleteVisitor(user.username, req.body["visitorId"]);
 
         res.sendStatus(200);
     }
 
     async updateVisitor(req: Request, res: Response) {
-        const isVisitorUpdated = this.visitorService.tryToUpdateVisitor(req.body);
+        const user = req.user as { username: string };
+        const isVisitorUpdated = this.visitorService.tryToUpdateVisitor(user.username, req.body);
 
         if (!isVisitorUpdated) {
             return res.sendStatus(400);

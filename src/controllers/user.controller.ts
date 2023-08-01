@@ -11,7 +11,7 @@ export class UserController {
         this.userService = userService;        
     }
 
-    getUser(req: Request, res: Response) {
+    getLoginStatus(req: Request, res: Response) {
         res.sendStatus(200);
     }
 

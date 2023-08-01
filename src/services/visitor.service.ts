@@ -2,16 +2,15 @@ import { injectable } from "inversify";
 import { dynamoDB } from "../app";
 import { validateSchema } from "../functions";
 import { addVisitorSchema, updateVisitorSchema } from "../schemas";
-import { generateExpression } from "../functions";
+import { getVisitorUpdateExpression } from "../functions";
 import { Visitor } from "../models";
+import { visitorTable } from "../config";
 
 @injectable()
 export class VisitorService {
-    private readonly visitorTable = process.env.VISITORS_TABLE as string;
-
     async addUser(username: string) {
         const params = {
-            TableName: this.visitorTable,
+            TableName: visitorTable,
             Item: {
                 username: username,
                 visitors: []
@@ -21,77 +20,60 @@ export class VisitorService {
         await dynamoDB.put(params).promise();
     }
 
-    async getVisitors() {
+    async getVisitors(username: string) {
         const params = {
-            TableName: this.visitorTable
-        }
-    
-        const data = await dynamoDB.scan(params).promise();
-
-        return data.Items;
-    }
-
-    async getVisitor(id: string) {
-        const params = {
-            TableName: this.visitorTable,
+            TableName: visitorTable,
             Key: {
-                visitorId: {
-                    S: id
-                }
+                username: username
             }
         }
-    
-        const visitor = await dynamoDB.get(params).promise();
-    
-        return visitor.Item;
+
+        const data = await dynamoDB.get(params).promise();
+
+        return data.Item?.visitors;
     }
 
-    async tryToAddVisitor(body: any): Promise<boolean> {
+    async tryToAddVisitor(username: string, body: any): Promise<boolean> {
         const isValidateSchema = validateSchema(body, addVisitorSchema);
 
         if (!isValidateSchema) {
             return false;
         }
-    
-        const newVisitor = {
-            visitorId: {
-                S: body["visitors"]["visitorId"]
+
+        const visitor: Visitor = body;
+ 
+        const params = {
+            TableName: visitorTable,
+            Key: {
+                username: username
             },
-            visitorName: {
-                S: body["visitorName"]
-            },
-            visitorSurname: {
-                S: body["visitorSurname"]
-            },
-            visitorEntryTime: {
-                S: body["visitorEntryTime"]
+            UpdateExpression: "SET visitors = list_append(visitors, :newValue)",
+            ExpressionAttributeValues: {
+                ":newValue": [visitor]
             }
         }
     
-        const params = {
-            TableName: this.visitorTable,
-            Item: newVisitor
-        }
-    
-        await dynamoDB.put(params).promise();
+        await dynamoDB.update(params).promise();
     
         return true;
     }
 
-    async deleteVisitor(id: string) {
+    async deleteVisitor(username: string, visitorId: string) {
+        const visitors = await this.getVisitors(username);
+        const visitorIndex = visitors?.findIndex((visitor: any) => visitor.visitorId == visitorId);
+
         const params = {
-            TableName: this.visitorTable,
+            TableName: visitorTable,
             Key: {
-                visitorId: {
-                    S: id
-                }
-            }
+                username: username
+            },
+            UpdateExpression: `REMOVE visitors[${visitorIndex}]`
         }
     
-        await dynamoDB.delete(params).promise();
+        await dynamoDB.update(params).promise();
     }
 
-    async tryToUpdateVisitor(body: any): Promise<boolean> {
+    async tryToUpdateVisitor(username: string, body: any): Promise<boolean> {
         const isValidateSchema = validateSchema(body, updateVisitorSchema);
 
         if (!isValidateSchema) {
@@ -105,14 +87,15 @@ export class VisitorService {
             return false;
         }
 
-        const dynamoDBUpdateArgs = generateExpression(visitor);
+        const visitors = await this.getVisitors(username);
+        const visitorIndex = visitors?.findIndex((visitor: any) => visitor.visitorId == body["visitorId"]);
+
+        const dynamoDBUpdateArgs = getVisitorUpdateExpression(visitorIndex, visitor);
 
         const params = {
-            TableName: this.visitorTable,
+            TableName: visitorTable,
             Key: {
-                visitorId: {
-                    S: visitor.visitorId
-                }
+                username: username
             },
             UpdateExpression: dynamoDBUpdateArgs.updateExpression,
             ExpressionAttributeValues: dynamoDBUpdateArgs.expressionAttributeValues
